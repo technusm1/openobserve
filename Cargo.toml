@@ -188,6 +188,7 @@ actix-service = "2.0.3"
 actix-utils = "3.0.1"
 derive_more = { version = "2.0.1", features = ["full"] }
 brotli = "8.0.1"
+tokio-rustls = "0.26.1"
 
 [dev-dependencies]
 async-walkdir.workspace = true
@@ -339,6 +340,7 @@ tempfile = "3"
 thiserror = "1.0"
 time = "0.3"
 tokio = { version = "1", features = ["full"] }
+tokio-rustls = "0.26"
 tokio-util = { version = "0.7.12", features = ["compat"] }
 tokio-stream = "0.1"
 tonic = { version = "0.12.3", features = ["gzip", "prost", "tls"] }

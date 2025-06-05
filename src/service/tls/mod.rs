@@ -17,7 +17,11 @@ use std::{io::BufReader, sync::Arc};
 
 use actix_tls::connect::rustls_0_23::{native_roots_cert_store, webpki_roots_cert_store};
 use itertools::Itertools as _;
-use rustls::{ClientConfig, ServerConfig};
+use rustls::{ClientConfig, DigitallySignedStruct, ServerConfig, SignatureScheme};
+use rustls::client::danger;
+use rustls::crypto::{verify_tls12_signature, verify_tls13_signature, CryptoProvider};
+use rustls::crypto::ring::default_provider;
+use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
 use rustls_pemfile::{certs, private_key};
 
 pub fn http_tls_config() -> Result<ServerConfig, anyhow::Error> {
@@ -90,4 +94,99 @@ pub fn client_tls_config() -> Result<Arc<ClientConfig>, anyhow::Error> {
 
 pub fn reqwest_client_tls_config() -> Result<reqwest::Client, anyhow::Error> {
     todo!()
+}
+
+pub fn tcp_tls_server_config() -> Result<ServerConfig, anyhow::Error> {
+    let cfg = config::get_config();
+    let _ = CryptoProvider::install_default(default_provider());
+    let cert_file =
+        &mut BufReader::new(std::fs::File::open(&cfg.tcp.tcp_tls_cert_path).map_err(|e| {
+            anyhow::anyhow!(
+                "Failed to open TLS certificate file {}: {}",
+                &cfg.tcp.tcp_tls_cert_path,
+                e
+            )
+        })?);
+    let key_file =
+        &mut BufReader::new(std::fs::File::open(&cfg.tcp.tcp_tls_key_path).map_err(|e| {
+            anyhow::anyhow!(
+                "Failed to open TLS key file {}: {}",
+                &cfg.tcp.tcp_tls_key_path,
+                e
+            )
+        })?);
+
+    let cert_chain = certs(cert_file);
+
+    let tls_config = ServerConfig::builder_with_protocol_versions(rustls::DEFAULT_VERSIONS)
+        .with_no_client_auth()
+        .with_single_cert(
+            cert_chain.try_collect::<_, Vec<_>, _>()?,
+            private_key(key_file)?.unwrap(),
+        )?;
+
+    Ok(tls_config)
+}
+
+pub fn tcp_tls_self_connect_client_config() -> Result<Arc<ClientConfig>, anyhow::Error> {
+    let config = ClientConfig::builder()
+        .dangerous()
+        .with_custom_certificate_verifier(SkipServerVerification::new())
+        .with_no_client_auth();
+
+    Ok(Arc::new(config))
+}
+
+// Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
+#[derive(Debug)]
+struct SkipServerVerification(Arc<CryptoProvider>);
+
+impl SkipServerVerification {
+    fn new() -> Arc<Self> {
+        Arc::new(Self(Arc::new(rustls::crypto::ring::default_provider())))
+    }
+}
+
+impl danger::ServerCertVerifier for SkipServerVerification {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &CertificateDer<'_>,
+        _intermediates: &[CertificateDer<'_>],
+        _server_name: &ServerName<'_>,
+        _ocsp: &[u8],
+        _now: UnixTime,
+    ) -> Result<danger::ServerCertVerified, rustls::Error> {
+        Ok(danger::ServerCertVerified::assertion())
+    }
+    fn verify_tls12_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &DigitallySignedStruct,
+    ) -> Result<danger::HandshakeSignatureValid, rustls::Error> {
+        verify_tls12_signature(
+            message,
+            cert,
+            dss,
+            &self.0.signature_verification_algorithms,
+        )
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &DigitallySignedStruct,
+    ) -> Result<danger::HandshakeSignatureValid, rustls::Error> {
+        verify_tls13_signature(
+            message,
+            cert,
+            dss,
+            &self.0.signature_verification_algorithms,
+        )
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
+        self.0.signature_verification_algorithms.supported_schemes()
+    }
 }
