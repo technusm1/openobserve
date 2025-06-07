@@ -150,7 +150,7 @@ pub async fn toggle_state(server: SyslogServer) -> Result<HttpResponse, io::Erro
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn get_ca_cert() -> Result<HttpResponse, io::Error> {
+pub async fn get_tcp_tls_ca_cert() -> Result<HttpResponse, io::Error> {
     let cfg = config::get_config();
     let ca_cert_path = &cfg.tcp.tcp_tls_ca_cert_path;
     log::info!("ca_cert_path: {}", ca_cert_path);
@@ -166,7 +166,7 @@ pub async fn get_ca_cert() -> Result<HttpResponse, io::Error> {
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn get_cert() -> Result<HttpResponse, io::Error> {
+pub async fn get_tcp_tls_cert() -> Result<HttpResponse, io::Error> {
     let cfg = config::get_config();
     let cert_path = &cfg.tcp.tcp_tls_cert_path;
     log::info!("cert_path: {}", cert_path);

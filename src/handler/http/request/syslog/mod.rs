@@ -153,8 +153,8 @@ async fn delete_route(path: web::Path<(String, String)>) -> impl Responder {
     ),
 )]
 #[get("/syslog-tcp-server-ca-cert")]
-async fn get_ca_cert() -> impl Responder {
-    syslogs_route::get_ca_cert().await
+async fn get_tcp_tls_ca_cert() -> impl Responder {
+    syslogs_route::get_tcp_tls_ca_cert().await
 }
 
 /// GetSyslogTCPServerCert
@@ -174,6 +174,6 @@ async fn get_ca_cert() -> impl Responder {
     ),
 )]
 #[get("/syslog-tcp-server-cert")]
-async fn get_cert() -> impl Responder {
-    syslogs_route::get_cert().await
+async fn get_tcp_tls_cert() -> impl Responder {
+    syslogs_route::get_tcp_tls_cert().await
 }
