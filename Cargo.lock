@@ -1734,7 +1734,7 @@ dependencies = [
  "bitflags 2.9.0",
  "cexpr",
  "clang-sys",
- "itertools 0.10.5",
+ "itertools 0.12.1",
  "lazy_static",
  "lazycell",
  "log",
@@ -5471,7 +5471,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07033963ba89ebaf1584d767badaa2e8fcec21aedea6b8c0346d487d49c28667"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -6370,6 +6370,7 @@ dependencies = [
  "pyroscope_pprofrs",
  "rand",
  "rayon",
+ "rcgen",
  "regex",
  "regex-syntax 0.8.5",
  "report_server",
@@ -7740,6 +7741,19 @@ checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "rcgen"
+version = "0.13.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75e669e5202259b5314d1ea5397316ad400819437857b90861765f24c4cf80a2"
+dependencies = [
+ "pem",
+ "ring",
+ "rustls-pki-types",
+ "time",
+ "yasna",
 ]
 
 [[package]]
@@ -11269,6 +11283,15 @@ name = "yansi"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfe53a6657fd280eaa890a3bc59152892ffa3e30101319d168b781ed6529b049"
+
+[[package]]
+name = "yasna"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e17bb3549cc1321ae1296b9cdc2698e2b6cb1992adfa19a8c72e5b7a738f44cd"
+dependencies = [
+ "time",
+]
 
 [[package]]
 name = "yoke"

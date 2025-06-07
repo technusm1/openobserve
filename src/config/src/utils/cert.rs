@@ -31,7 +31,6 @@ impl<'a> danger::ServerCertVerifier for SelfSignedCertVerifier<'a> {
         } else {
             Err(rustls::Error::General("Server certificate not trusted".into()))
         }
-
     }
 
     fn verify_tls12_signature(

@@ -140,7 +140,7 @@ use crate::{common::meta, handler::http::request};
         request::syslog::list_routes,
         request::syslog::delete_route,
         request::syslog::get_tcp_tls_ca_cert,
-        request::syslog::get_tcp_tls__cert,
+        request::syslog::get_tcp_tls_cert,
         request::clusters::list_clusters,
         request::short_url::shorten,
         request::short_url::retrieve,
